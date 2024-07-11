@@ -238,24 +238,30 @@ with col2:
         st.session_state.incident_number = None  # Reset incident number
         st.rerun()
 
+# Button functionalities
 with col3:
     if st.button("Resolution Steps"):
         if incident_number:
             incident_data = fetch_incident_data(incident_number)
             if incident_data:
-                incident_notes = fetch_incident_notes(incident_data['sys_id'])
-                
-                # Fetch detailed resolution steps
-                resolution_steps = fetch_detailed_resolution_steps(incident_data, incident_notes)
-                
-                # Store data in session state
-                st.session_state.incident_data = incident_data
-                st.session_state.incident_notes = incident_notes
-                st.session_state.resolution_steps = resolution_steps
+                # Check if incident state is Closed or Resolved
+                if incident_data['state'] in ['6', '5', '7']:  # Assuming state '6' is Closed and '5' is Resolved
+                    st.info("Resolution steps are not available for Canceled or Closed or Resolved incidents.")
+                else:
+                    incident_notes = fetch_incident_notes(incident_data['sys_id'])
+                    
+                    # Fetch detailed resolution steps
+                    resolution_steps = fetch_detailed_resolution_steps(incident_data, incident_notes)
+                    
+                    # Store data in session state
+                    st.session_state.incident_data = incident_data
+                    st.session_state.incident_notes = incident_notes
+                    st.session_state.resolution_steps = resolution_steps
             else:
                 st.error("Incident not found.")
         else:
             st.error("Please enter an incident number.")
+
 
 # Display incident summary and notes
 if st.session_state.incident_data:
